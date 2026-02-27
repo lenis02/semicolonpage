@@ -28,15 +28,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback
   ) {
     try {
-      const { id, name, emails } = profile;
-      const providerId = id;
-      const email = emails![0].value;
+      // id가 구글의 고유 socialId
+      const { id, name } = profile;
+      const socialId = id;
+
       const fullname = `${name?.familyName ?? ''}${name?.givenName ?? ''}`;
 
-      const user: User = await this.userService.findByEmailOrSave(
-        email,
+      const user: User = await this.userService.findBySocialIdOrSave(
         fullname,
-        providerId
+        socialId,
+        'google'
       );
 
       done(null, user);

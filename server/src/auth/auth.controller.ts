@@ -3,10 +3,12 @@ import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard, JwtRefreshGuard } from './guard/google.guard';
 import { User } from '../user/entities/user.entity';
+import { KakaoAuthGuard } from './guard/kakao.guard';
 
 interface JwtPayload {
   sub: number;
-  email: string;
+  socialId: string;
+  provider: string;
 }
 
 @Controller('auth')
@@ -21,25 +23,36 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   googleAuthRedirect(
     @Req() req: Request
-  ): ReturnType<AuthService['googleLogin']> {
+  ): ReturnType<AuthService['socialLogin']> {
     const user = req.user as User;
-    return this.authService.googleLogin(user);
+    return this.authService.socialLogin(user);
+  }
+
+  @Get('kakao')
+  @UseGuards(KakaoAuthGuard)
+  async kakaoAuth(): Promise<void> {}
+
+  @Get('kakao/callback')
+  @UseGuards(KakaoAuthGuard)
+  kakaoAuthRedirect(
+    @Req() req: Request
+  ): ReturnType<AuthService['socialLogin']> {
+    const user = req.user as User;
+    return this.authService.socialLogin(user);
   }
 
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async refresh(@Req() req: Request): ReturnType<AuthService['refreshToken']> {
     const user = req.user as JwtPayload;
-    const userId = user.sub;
     const authHeader = req.headers.authorization;
     const refreshToken = authHeader?.startsWith('Bearer ')
       ? authHeader.replace('Bearer ', '')
       : null;
-
     if (!refreshToken) {
       throw new Error('Refresh token is missing in Authorization header');
     }
 
-    return this.authService.refreshToken(userId, refreshToken);
+    return this.authService.refreshToken(user.sub, refreshToken);
   }
 }

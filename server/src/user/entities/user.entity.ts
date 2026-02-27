@@ -4,21 +4,26 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity()
+@Unique(['provider', 'socialId'])
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
   email!: string;
 
   @Column()
   name!: string;
 
-  @Column({ nullable: true })
-  socialId?: string;
+  @Column()
+  provider!: string;
+
+  @Column()
+  socialId!: string;
 
   @Column({ type: 'text', nullable: true })
   refreshToken?: string | null;

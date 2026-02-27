@@ -1,11 +1,15 @@
 import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmail({}, { message: '올바른 이메일 형식이 아닙니다. ' })
-  @IsNotEmpty()
-  email!: string;
-
   @IsString()
   @IsNotEmpty()
   name!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  socialId!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  provider!: string;
 }

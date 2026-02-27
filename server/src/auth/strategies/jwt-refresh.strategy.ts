@@ -4,6 +4,12 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
 
+interface JwtPayload {
+  sub: number;
+  socialId: string;
+  provider: string;
+}
+
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
@@ -17,8 +23,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(req: Request, payload: any) {
+  async validate(req: Request, payload: JwtPayload) {
     const refreshToken = req.headers.authorization?.split(' ')[1];
-    return { ...payload, refreshToken };
+    return {
+      sub: payload.sub,
+      socialId: payload.socialId,
+      provider: payload.provider,
+      refreshToken,
+    };
   }
 }

@@ -8,6 +8,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
+import { KakaoStrategy } from './strategies/kakao.strategy';
 
 @Module({
   imports: [UserModule, PassportModule, JwtModule.register({}), ConfigModule],
@@ -15,6 +16,7 @@ import { UserModule } from '../user/user.module';
   providers: [
     AuthService,
     GoogleStrategy,
+    KakaoStrategy,
     JwtAccessStrategy,
     JwtRefreshStrategy,
   ],

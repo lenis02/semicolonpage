@@ -11,21 +11,21 @@ export class UserService {
     private userRepository: Repository<User>
   ) {}
 
-  async findByEmailOrSave(
-    email: string,
+  async findBySocialIdOrSave(
     name: string,
-    providerId: string
+    socialId: string,
+    provider: string
   ): Promise<User> {
     let user = await this.userRepository.findOne({
-      where: { email },
+      where: { socialId, provider },
     });
 
     if (!user) {
       user = await this.userRepository.save(
         this.userRepository.create({
-          email,
           name,
-          socialId: providerId,
+          socialId,
+          provider,
         })
       );
     }
@@ -39,16 +39,20 @@ export class UserService {
   }
 
   async updateRefreshToken(
-    id: number,
+    socialId: string,
+    provider: string,
     refreshToken: string | null
   ): Promise<void> {
-    await this.userRepository.update(id, { refreshToken });
+    await this.userRepository.update({ socialId, provider }, { refreshToken });
   }
 
   async createUser(dto: CreateUserDto): Promise<User> {
-    return this.userRepository.create({
-      email: dto.email,
-      name: dto.name,
-    });
+    return this.userRepository.save(
+      this.userRepository.create({
+        name: dto.name,
+        socialId: dto.socialId,
+        provider: dto.provider,
+      })
+    );
   }
 }

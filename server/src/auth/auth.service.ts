@@ -13,8 +13,12 @@ export class AuthService {
     private userService: UserService
   ) {}
 
-  async googleLogin(user: User) {
-    const payload = { email: user.email, sub: user.id };
+  async socialLogin(user: User) {
+    const payload = {
+      socialId: user.socialId,
+      provider: user.provider,
+      sub: user.id,
+    };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_ACCESS_SECRET'),
@@ -27,7 +31,11 @@ export class AuthService {
     });
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.userService.updateRefreshToken(user.id, hashedRefreshToken);
+    await this.userService.updateRefreshToken(
+      user.socialId!,
+      user.provider,
+      hashedRefreshToken
+    );
 
     return {
       accessToken,
@@ -60,6 +68,6 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    return this.googleLogin(user);
+    return this.socialLogin(user);
   }
 }
