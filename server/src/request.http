@@ -10,4 +10,78 @@ Content-Type: application/json
 
 ### 2. 로그아웃 
 POST http://localhost:3000/api/auth/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxJZCI6IjExNzM1MDEwMzc1MDgzMzE5NzkzMCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwic3ViIjo1LCJpYXQiOjE3NzM2NDY3NDUsImV4cCI6MTc3MzY0NzY0NX0.sqoTybEK7JsrZYWmxJrDOGyN4S_vIs8JrGn-KzbR2pE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxJZCI6IjExNzM1MDEwMzc1MDgzMzE5NzkzMCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwic3ViIjo1LCJpYXQiOjE3NzM2NDkwNjMsImV4cCI6MTc3MzY0OTk2M30.BN4gxFLpmeppxexmF5vgIQN3fy6x1BsMdwLeNcEeX_o
+
+### 3. 내 클라이언트 등록 테스트 (POST)
+POST http://localhost:3000/api/client
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxJZCI6IjExNzM1MDEwMzc1MDgzMzE5NzkzMCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwic3ViIjo1LCJpYXQiOjE3NzM2NDkwNjMsImV4cCI6MTc3MzY0OTk2M30.BN4gxFLpmeppxexmF5vgIQN3fy6x1BsMdwLeNcEeX_o
+
+{
+  "name": "테스트",
+  "company": "test company",
+  "email": "test@selu.com"
+}
+
+### 4. 내 클라이언트 목록 조회 테스트 (GET)
+GET http://localhost:3000/api/client
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb2NpYWxJZCI6IjExNzM1MDEwMzc1MDgzMzE5NzkzMCIsInByb3ZpZGVyIjoiZ29vZ2xlIiwic3ViIjo1LCJpYXQiOjE3NzM2NDkwNjMsImV4cCI6MTc3MzY0OTk2M30.BN4gxFLpmeppxexmF5vgIQN3fy6x1BsMdwLeNcEeX_o
+
+
+### 9. 클라이언트 정보 수정 테스트 (PATCH)
+# URL 끝의 '1'은 수정하려는 클라이언트의 실제 ID로 바꿔주세요.
+PATCH http://localhost:3000/api/client/1
+Content-Type: application/json
+Authorization: Bearer 여기에_액세스_토큰
+
+{
+  "email": "new-ceo@selu.com",
+  "company": "씰룩 글로벌"
+}
+
+### 10. 클라이언트 삭제 테스트 (DELETE)
+# URL 끝의 '1'은 삭제하려는 클라이언트의 실제 ID로 바꿔주세요.
+DELETE http://localhost:3000/api/client/1
+Authorization: Bearer 여기에_액세스_토큰
+
+### 11. 새 프로젝트 생성 테스트 (POST)
+POST http://localhost:3000/api/project
+Content-Type: application/json
+Authorization: Bearer 여기에_액세스_토큰
+
+{
+  "title": "씰룩 방탈출 웹 프론트엔드 구축",
+  "clientId": 1,
+  "techStack": ["React", "Tailwind CSS", "Zustand"]
+}
+
+### 12. 내 프로젝트 목록 조회 (GET) - JOIN 확인!
+GET http://localhost:3000/api/project
+Authorization: Bearer 여기에_액세스_토큰
+
+### 13. 할 일 생성 (마감기한 지난 걸로 세팅)
+# projectId에는 아까 만든 프로젝트 ID를 넣으세요!
+POST http://localhost:3000/api/task
+Content-Type: application/json
+Authorization: Bearer 여기에_토큰_넣기
+
+{
+  "projectId": 1,
+  "content": "메인 페이지 UI 디자인 시안 전달",
+  "dueDate": "2026-03-15T00:00:00.000Z"
+}
+
+### 14. 할 일 완료 처리 (수정 테스트)
+# URL 끝의 '1'은 실제 할 일 ID로 변경
+PATCH http://localhost:3000/api/task/1
+Content-Type: application/json
+Authorization: Bearer 여기에_액세스_토큰
+
+{
+  "isDone": true
+}
+
+### 15. 할 일 삭제 테스트
+# URL 끝의 '1'은 실제 할 일 ID로 변경
+DELETE http://localhost:3000/api/task/1
+Authorization: Bearer 여기에_액세스_토큰

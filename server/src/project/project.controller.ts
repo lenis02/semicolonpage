@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { JwtAccessGuard } from '../auth/guard/jwt-access.guard';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
 
 @Controller('project')
+@UseGuards(JwtAccessGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  // 프로젝트 등록
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.create(createProjectDto);
+  create(
+    @Body() createProjectDto: CreateProjectDto,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.projectService.create(createProjectDto, userId);
   }
 
+  // 전체 프로젝트 목록 조회
   @Get()
-  findAll() {
-    return this.projectService.findAll();
+  findAll(@CurrentUser('sub') userId: number) {
+    return this.projectService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectService.findOne(+id);
-  }
-
+  // 프로젝트 수정
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectService.update(+id, updateProjectDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.projectService.update(id, updateProjectDto, userId);
   }
 
+  // 프로젝트 삭제
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectService.remove(+id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.projectService.remove(id, userId);
   }
 }

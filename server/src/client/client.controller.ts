@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
+import { JwtAccessGuard } from '../auth/guard/jwt-access.guard';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { UpdateClientDto } from './dto/update-client.dto';
 
 @Controller('client')
+@UseGuards(JwtAccessGuard)
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  // 클라이언트 등록하기
   @Post()
-  create(@Body() createClientDto: CreateClientDto) {
-    return this.clientService.create(createClientDto);
+  create(
+    @Body() CreateClientDto: CreateClientDto,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.clientService.create(CreateClientDto, userId);
   }
 
+  // 클라이언트 목록 조회
   @Get()
-  findAll() {
-    return this.clientService.findAll();
+  findAll(@CurrentUser('sub') userId: number) {
+    return this.clientService.findAll(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientService.findOne(+id);
-  }
-
+  // 클라이언트 수정
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
-    return this.clientService.update(+id, updateClientDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateClientDto: UpdateClientDto,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.clientService.update(id, updateClientDto, userId);
   }
 
+  // 클라이언트 삭제
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientService.remove(+id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('sub') userId: number
+  ) {
+    return this.clientService.remove(id, userId);
   }
 }
