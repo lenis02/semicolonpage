@@ -21,7 +21,7 @@ export class ProjectService {
       client: { id: clientId },
     });
 
-    return await this.projectRepository.save(newProject);
+    return await this.projectRepository.insert(newProject);
   }
 
   async findAll(userId: number) {

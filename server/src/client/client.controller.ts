@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
@@ -24,8 +25,10 @@ export class ClientController {
   @Post()
   create(
     @Body() CreateClientDto: CreateClientDto,
-    @CurrentUser('sub') userId: number
+    // @CurrentUser('sub') userId: number
+    @Req() req: any
   ) {
+    const userId = req.user.sub;
     return this.clientService.create(CreateClientDto, userId);
   }
 

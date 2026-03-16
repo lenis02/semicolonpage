@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, FormsModule],
   templateUrl: './app.html',
 })
 export class App implements OnInit {
@@ -15,6 +16,13 @@ export class App implements OnInit {
   private http = inject(HttpClient);
 
   dashboardData: any = null;
+
+  isClientModalOpen = false;
+  newClient = {
+    name: '',
+    company: '',
+    email: '',
+  };
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
@@ -32,6 +40,36 @@ export class App implements OnInit {
         console.error('데이터 가져오기 실패', err);
       },
     });
+  }
+
+  openClientModal() {
+    this.isClientModalOpen = true;
+  }
+  closeClientModal() {
+    this.isClientModalOpen = false;
+
+    this.newClient = { name: '', company: '', email: '' };
+  }
+
+  saveClient() {
+    if (!this.newClient.name.trim()) {
+      alert('클라이언트 이름은 필수입니다!');
+      return;
+    }
+
+    this.http
+      .post('http://localhost:3000/api/client', this.newClient)
+      .subscribe({
+        next: (res) => {
+          alert('클라이언트가 성공적으로 등록되었습니다!');
+          this.closeClientModal();
+          this.fetchDashboardSummary();
+        },
+        error: (err) => {
+          console.error('저장 실패:', err);
+          alert('저장에 실패했습니다.');
+        },
+      });
   }
 
   loginWithGoogle() {

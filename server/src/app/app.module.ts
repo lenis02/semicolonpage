@@ -4,6 +4,10 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ClientModule } from '../client/client.module';
+import { DashboardModule } from '../dashboard/dashboard.module';
+import { TaskModule } from '../task/task.module';
+import { ProjectModule } from '../project/project.module';
 
 @Module({
   imports: [
@@ -27,6 +31,10 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     UserModule,
     AuthModule,
+    ClientModule,
+    ProjectModule,
+    TaskModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}

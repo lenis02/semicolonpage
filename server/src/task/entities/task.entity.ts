@@ -1,7 +1,7 @@
 import { Project } from 'server/src/project/entities/project.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-Entity();
+@Entity()
 export class Task {
   @PrimaryGeneratedColumn()
   id!: number;

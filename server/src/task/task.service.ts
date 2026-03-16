@@ -22,7 +22,7 @@ export class TaskService {
       ...taskData,
       project: { id: projectId },
     });
-    return await this.taskRepository.save(newTask);
+    return await this.taskRepository.insert(newTask);
   }
 
   // async findAll() {

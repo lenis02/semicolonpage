@@ -18,7 +18,7 @@ export class ClientService {
       ...createClientDto,
       user: { id: userId } as User,
     });
-    return await this.clientRepository.save(newClient);
+    return await this.clientRepository.insert(newClient);
   }
 
   async findAll(userId: number) {

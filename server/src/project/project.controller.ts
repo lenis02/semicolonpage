@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -24,8 +25,10 @@ export class ProjectController {
   @Post()
   create(
     @Body() createProjectDto: CreateProjectDto,
-    @CurrentUser('sub') userId: number
+    // @CurrentUser('sub') userId: number
+    @Req() req: any
   ) {
+    const userId = req.user.sub;
     return this.projectService.create(createProjectDto, userId);
   }
 
