@@ -1,5 +1,5 @@
-import { Controller, Req, Get, Post, UseGuards } from '@nestjs/common';
-import type { Request } from 'express';
+import { Controller, Req, Get, Post, UseGuards, Res } from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard, JwtRefreshGuard } from './guard/google.guard';
 import { User } from '../user/entities/user.entity';
@@ -22,11 +22,10 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  googleAuthRedirect(
-    @Req() req: Request
-  ): ReturnType<AuthService['socialLogin']> {
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
-    return this.authService.socialLogin(user);
+    const { accessToken } = await this.authService.socialLogin(user);
+    res.redirect(`http://localhost:4200/login/success?token=${accessToken}`);
   }
 
   @Get('kakao')
@@ -35,11 +34,10 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(KakaoAuthGuard)
-  kakaoAuthRedirect(
-    @Req() req: Request
-  ): ReturnType<AuthService['socialLogin']> {
+  async kakaoAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
-    return this.authService.socialLogin(user);
+    const { accessToken } = await this.authService.socialLogin(user);
+    res.redirect(`http://localhost:4200/login/success?token=${accessToken}`);
   }
 
   @UseGuards(JwtRefreshGuard)

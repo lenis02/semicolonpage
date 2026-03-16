@@ -1,3 +1,52 @@
-<!-- <app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet> -->
-<app-dashboard></app-dashboard>
+<div style="padding: 2rem; font-family: sans-serif">
+  <h1>🚀 프리랜서 대시보드</h1>
+
+  <div *ngIf="!authService.isLoggedIn()">
+    <p>대시보드에 접근하려면 로그인이 필요합니다.</p>
+    <button
+      (click)="loginWithGoogle()"
+      style="padding: 10px 20px; font-size: 16px; cursor: pointer"
+    >
+      Google로 로그인하기
+    </button>
+    <button
+      (click)="loginWithKakao()"
+      style="padding: 10px 20px; font-size: 16px; cursor: pointer"
+    >
+      카카오로 로그인하기
+    </button>
+  </div>
+
+  <div *ngIf="authService.isLoggedIn()">
+    <p>환영합니다! 로그인이 완료되었습니다. 🎉</p>
+    <button
+      (click)="logout()"
+      style="padding: 10px 20px; font-size: 16px; cursor: pointer"
+    >
+      로그아웃
+    </button>
+    <hr style="margin: 20px 0" />
+
+    <div
+      *ngIf="dashboardData"
+      style="background: #f3f4f6; padding: 20px; border-radius: 8px"
+    >
+      <h2>📊 나의 사업 현황 (병렬 처리 API 결과)</h2>
+      <ul style="font-size: 18px; line-height: 1.6">
+        <li>
+          🤝 총 클라이언트: <strong>{{ dashboardData.totalClients }}</strong> 명
+        </li>
+        <li>
+          🔥 진행 중인 프로젝트:
+          <strong>{{ dashboardData.ongoingProjects }}</strong> 개
+        </li>
+        <li>
+          ⏳ 남은 할 일(Task):
+          <strong>{{ dashboardData.pendingTasks }}</strong> 개
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
