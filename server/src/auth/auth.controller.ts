@@ -1,4 +1,12 @@
-import { Controller, Req, Get, Post, UseGuards, Res } from '@nestjs/common';
+import {
+  Controller,
+  Req,
+  Get,
+  Post,
+  UseGuards,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleAuthGuard, JwtRefreshGuard } from './guard/google.guard';
@@ -24,8 +32,10 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
-    const { accessToken } = await this.authService.socialLogin(user);
-    res.redirect(`http://localhost:4200/login/success?token=${accessToken}`);
+    const { accessToken, refreshToken } = await this.authService.socialLogin(user);
+    res.redirect(
+      `http://localhost:4200/login/success?token=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`
+    );
   }
 
   @Get('kakao')
@@ -36,8 +46,10 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   async kakaoAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user as User;
-    const { accessToken } = await this.authService.socialLogin(user);
-    res.redirect(`http://localhost:4200/login/success?token=${accessToken}`);
+    const { accessToken, refreshToken } = await this.authService.socialLogin(user);
+    res.redirect(
+      `http://localhost:4200/login/success?token=${encodeURIComponent(accessToken)}&refreshToken=${encodeURIComponent(refreshToken)}`
+    );
   }
 
   @UseGuards(JwtRefreshGuard)
@@ -49,7 +61,9 @@ export class AuthController {
       ? authHeader.replace('Bearer ', '')
       : null;
     if (!refreshToken) {
-      throw new Error('Refresh token is missing in Authorization header');
+      throw new UnauthorizedException(
+        'Refresh token is missing in Authorization header'
+      );
     }
 
     return this.authService.refreshToken(user.sub, refreshToken);

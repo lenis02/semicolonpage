@@ -1,43 +1,67 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
-import { catchError, throwError } from 'rxjs';
+import { catchError, from, switchMap, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const token = authService.getToken();
+  const isRefreshEndpoint = req.url.includes('/api/auth/refresh');
 
-  if (token && authService.isTokenExpired(token)) {
+  const withAuthHeader = (token: string | null) =>
+    token
+      ? req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      : req;
+
+  const logoutAndRedirect = () => {
     authService.logout();
     window.location.href = '/';
-    return next(req);
-  }
+  };
 
-  // 토큰이 localStorage에 있다면
-  if (token) {
-    const clonedReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return next(clonedReq).pipe(
-      catchError((error) => {
-        if (error?.status === 401) {
-          authService.logout();
-          window.location.href = '/';
-        }
-        return throwError(() => error);
-      })
-    );
-  }
+  const tryRefresh = () => {
+    if (isRefreshEndpoint) {
+      return from(Promise.resolve(null));
+    }
 
-  return next(req).pipe(
+    const inFlight = authService.getRefreshInFlight();
+    if (inFlight) {
+      return from(inFlight);
+    }
+
+    const refreshPromise = authService
+      .refreshAccessToken()
+      .finally(() => authService.setRefreshInFlight(null));
+
+    authService.setRefreshInFlight(refreshPromise);
+    return from(refreshPromise);
+  };
+
+  const currentToken = authService.getToken();
+  const requestToken =
+    currentToken && !authService.isTokenExpired(currentToken) ? currentToken : null;
+
+  return next(withAuthHeader(requestToken)).pipe(
     catchError((error) => {
-      if (error?.status === 401) {
-        authService.logout();
-        window.location.href = '/';
+      if (error?.status !== 401 || isRefreshEndpoint) {
+        return throwError(() => error);
       }
-      return throwError(() => error);
+
+      return tryRefresh().pipe(
+        switchMap((newToken) => {
+          if (!newToken) {
+            logoutAndRedirect();
+            return throwError(() => error);
+          }
+          return next(withAuthHeader(newToken));
+        }),
+        catchError((refreshError) => {
+          logoutAndRedirect();
+          return throwError(() => refreshError);
+        })
+      );
     })
   );
 };
