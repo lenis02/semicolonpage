@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="flex-1 p-8 overflow-auto">
       <div
@@ -13,7 +14,10 @@ import { HttpClient } from '@angular/common/http';
         class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
       >
         <div
-          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          [routerLink]="['/clients']"
+          role="button"
+          tabindex="0"
+          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer"
         >
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-gray-500 text-sm font-semibold">총 클라이언트</h3>
@@ -26,7 +30,10 @@ import { HttpClient } from '@angular/common/http';
         </div>
 
         <div
-          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          [routerLink]="['/projects']"
+          role="button"
+          tabindex="0"
+          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer"
         >
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-gray-500 text-sm font-semibold">진행 중인 프로젝트</h3>
@@ -39,7 +46,10 @@ import { HttpClient } from '@angular/common/http';
         </div>
 
         <div
-          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+          [routerLink]="['/tasks']"
+          role="button"
+          tabindex="0"
+          class="bg-white/90 p-6 shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer"
         >
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-gray-500 text-sm font-semibold">남은 할 일</h3>

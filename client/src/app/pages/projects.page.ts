@@ -11,6 +11,12 @@ type Project = {
   techStack?: string[];
   client?: Client;
   clientId?: number;
+  revenueType?: 'PROFIT' | 'NON_PROFIT';
+  contractAmount?: number | null;
+  contractMethod?: 'FULL' | 'UPFRONT_BALANCE' | 'MONTHLY_INSTALLMENT' | null;
+  upfrontPercent?: number | null;
+  contractSignedAt?: string | null;
+  endDate?: string | null;
 };
 
 @Component({
@@ -151,6 +157,67 @@ type Project = {
               <option value="PAUSED">PAUSED</option>
             </select>
           </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">완료 시점</label>
+            <input
+              type="date"
+              [(ngModel)]="form.endDate"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">프로젝트 유형</label>
+            <select
+              [(ngModel)]="form.revenueType"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="PROFIT">영리(수익 있음)</option>
+              <option value="NON_PROFIT">비영리(포폴/개인/팀)</option>
+            </select>
+          </div>
+
+          <div *ngIf="form.revenueType === 'PROFIT'">
+            <label class="block text-sm font-bold text-gray-700 mb-1">계약 금액</label>
+            <input
+              type="number"
+              [(ngModel)]="form.contractAmount"
+              placeholder="예: 3000000"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+
+          <div *ngIf="form.revenueType === 'PROFIT'">
+            <label class="block text-sm font-bold text-gray-700 mb-1">계약 방식</label>
+            <select
+              [(ngModel)]="form.contractMethod"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            >
+              <option value="FULL">일시금</option>
+              <option value="UPFRONT_BALANCE">선수금 + 잔금</option>
+              <option value="MONTHLY_INSTALLMENT">월 분할</option>
+            </select>
+          </div>
+
+          <div *ngIf="form.revenueType === 'PROFIT' && form.contractMethod === 'UPFRONT_BALANCE'">
+            <label class="block text-sm font-bold text-gray-700 mb-1">선수금 비율(%)</label>
+            <input
+              type="number"
+              [(ngModel)]="form.upfrontPercent"
+              placeholder="예: 50"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
+
+          <div *ngIf="form.revenueType === 'PROFIT'">
+            <label class="block text-sm font-bold text-gray-700 mb-1">계약일</label>
+            <input
+              type="date"
+              [(ngModel)]="form.contractSignedAt"
+              class="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+          </div>
         </div>
 
         <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
@@ -179,10 +246,26 @@ export class ProjectsPage implements OnInit {
 
   isModalOpen = false;
   editingId: number | null = null;
-  form: { title: string; clientId: number | null; status: string } = {
+  form: {
+    title: string;
+    clientId: number | null;
+    status: string;
+    revenueType: 'PROFIT' | 'NON_PROFIT';
+    contractAmount: number | null;
+    contractMethod: 'FULL' | 'UPFRONT_BALANCE' | 'MONTHLY_INSTALLMENT';
+    upfrontPercent: number | null;
+    contractSignedAt: string;
+    endDate: string;
+  } = {
     title: '',
     clientId: null,
     status: 'ONGOING',
+    revenueType: 'PROFIT',
+    contractAmount: null as number | null,
+    contractMethod: 'FULL',
+    upfrontPercent: null as number | null,
+    contractSignedAt: '',
+    endDate: '',
   };
 
   ngOnInit() {
@@ -212,7 +295,17 @@ export class ProjectsPage implements OnInit {
 
   openCreate() {
     this.editingId = null;
-    this.form = { title: '', clientId: null, status: 'ONGOING' };
+    this.form = {
+      title: '',
+      clientId: null,
+      status: 'ONGOING',
+      revenueType: 'PROFIT',
+      contractAmount: null,
+      contractMethod: 'FULL',
+      upfrontPercent: null,
+      contractSignedAt: '',
+      endDate: '',
+    };
     this.isModalOpen = true;
   }
 
@@ -222,6 +315,14 @@ export class ProjectsPage implements OnInit {
       title: p.title ?? '',
       clientId: p.client?.id ?? (p.clientId ?? null),
       status: p.status || 'ONGOING',
+      revenueType: p.revenueType || 'PROFIT',
+      contractAmount: p.contractAmount ? Number(p.contractAmount) : null,
+      contractMethod: p.contractMethod || 'FULL',
+      upfrontPercent: p.upfrontPercent ? Number(p.upfrontPercent) : null,
+      contractSignedAt: p.contractSignedAt
+        ? String(p.contractSignedAt).slice(0, 10)
+        : '',
+      endDate: p.endDate ? String(p.endDate).slice(0, 10) : '',
     };
     this.isModalOpen = true;
   }
@@ -244,6 +345,26 @@ export class ProjectsPage implements OnInit {
       title: this.form.title.trim(),
       clientId: Number(this.form.clientId),
       status: this.form.status,
+      revenueType: this.form.revenueType,
+      contractAmount:
+        this.form.revenueType === 'PROFIT' && this.form.contractAmount != null
+          ? Number(this.form.contractAmount)
+          : undefined,
+      contractMethod:
+        this.form.revenueType === 'PROFIT' ? this.form.contractMethod : undefined,
+      upfrontPercent:
+        this.form.revenueType === 'PROFIT' &&
+        this.form.contractMethod === 'UPFRONT_BALANCE' &&
+        this.form.upfrontPercent != null
+          ? Number(this.form.upfrontPercent)
+          : undefined,
+      contractSignedAt:
+        this.form.revenueType === 'PROFIT' && this.form.contractSignedAt
+          ? new Date(this.form.contractSignedAt).toISOString()
+          : undefined,
+      endDate: this.form.endDate
+        ? new Date(this.form.endDate).toISOString()
+        : undefined,
     };
 
     const req$ = this.editingId

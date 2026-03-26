@@ -47,7 +47,12 @@
     class="w-64 bg-white/90 backdrop-blur shadow-[1px_0_10px_rgba(0,0,0,0.05)] flex flex-col z-10 border-r border-gray-100"
   >
     <div class="p-6 border-b border-gray-100">
-      <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight">Selu Dash</h1>
+      <a
+        [routerLink]="['/dashboard']"
+        class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight cursor-pointer"
+      >
+        Selu Dash
+      </a>
     </div>
 
     <nav class="flex-1 p-4 space-y-1">
@@ -79,6 +84,13 @@
         class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition cursor-pointer"
       >
         <span>할 일 (Tasks)</span>
+      </a>
+      <a
+        [routerLink]="['/revenue']"
+        routerLinkActive="bg-indigo-50 text-indigo-700 font-bold"
+        class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition cursor-pointer"
+      >
+        <span>매출 정산</span>
       </a>
     </nav>
 

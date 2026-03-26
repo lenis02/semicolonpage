@@ -4,6 +4,7 @@ import { DashboardPage } from './pages/dashboard.page';
 import { ClientsPage } from './pages/clients.page';
 import { ProjectsPage } from './pages/projects.page';
 import { TasksPage } from './pages/tasks.page';
+import { RevenuePage } from './pages/revenue.page';
 
 export const appRoutes: Route[] = [
   { path: 'login/success', component: AuthCallbackComponent },
@@ -12,4 +13,5 @@ export const appRoutes: Route[] = [
   { path: 'clients', component: ClientsPage },
   { path: 'projects', component: ProjectsPage },
   { path: 'tasks', component: TasksPage },
+  { path: 'revenue', component: RevenuePage },
 ];
